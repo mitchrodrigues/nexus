@@ -67,7 +67,7 @@ class SocketEngine
 					sock.set_flags
 					@sockets << sock 
 					NEXUS_LOGGER.info "Accepting connection #{sock.fileno}"
-					ClientManager.create_client sock	
+					cli = ClientManager.create_client sock		
 					next
 				end
 	    	inbuf = s.recv(MAX_READ)

@@ -1,7 +1,7 @@
 module Nexus 
 	class Core
 		attr_accessor :state, :config 
-		attr_accessor :start, :time, :debug
+		attr_accessor :start, :time, :debug, :me
 
 		def self.init(args)
 			@state = STATE_STARTUP
@@ -26,11 +26,21 @@ module Nexus
 					@debug = true
 				end
 			end
+
+			@me = ClientManager.create_client(0)
+			@me.name = @config["server"]["name"]
+			@me.host = @config["server"]["vhost"]
+			@me.link = nil
+
 			EventEngine::TimedEvent.add_event({
 				:class   => Nexus::Core,
 				:handler => :garbage_run 
 			})
 
+		end
+
+		def self.me
+			return @me
 		end
 
 		def self.config 

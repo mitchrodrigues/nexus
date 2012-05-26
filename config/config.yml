@@ -1,6 +1,10 @@
 ###
 #  Runtime configuration
 ##
+server:
+  name: cluster1
+  linkpass: linkP@ss
+  vhost: nexus1.omega-services.org
 
 listeners:
   primary:

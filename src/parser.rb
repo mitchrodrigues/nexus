@@ -2,21 +2,15 @@ class Parser
 
   def self.parse_line(socket, line)
     tokens = tokenize(line)
-    
-    unless tokens[0].blank? || tokens[0] == ""
-      client = ClientManager.find_by_name[tokens[0]]
-    end
-
-    unless client
-      client = ClientManager.find socket
-    end
-
-    if client 
-      EventEngine::Command.dispatch(client, tokens[1], tokens)
+    if tokens[0] != ""
+      client = ClientManager.find_by_name(tokens[0])
     else
-      NEXUS_LOGGER.info "Command from unknown client #{socket.to_i}"
+      client = ClientManager.find_by_socket(socket)
     end
-
+    command = tokens[1]
+    if client 
+      EventEngine::Command.dispatch(client, command, tokens[2,tokens.size])
+    end
   end
 
   def self.tokenize(line_in, string_prefix = ':', token_delim = ' ')

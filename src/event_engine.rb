@@ -1,22 +1,23 @@
 EVENT_CONT = 0
+EVENT_OK   = 0
 EVENT_STOP = 1
 
 module EventEngine
 
 	class Command
 		attr_accessor :controllers
-		def self.add_command(command, klass)
+		def self.add(command, klass)
 			cmd = command.downcase
 
 			#Init if not already set
 			@controllers ||= {}
 			@controllers[cmd] ||= []
-			
 			@controllers[cmd] << klass
 		end
 		def self.dispatch(client, command, args)
 			cmd = command.downcase
-			if @controllers[cmd]
+			return if @controllers.nil? 
+			unless @controllers[cmd].nil?
 				@controllers[cmd].each do |ctrl|
 					if ctrl.respond_to?(cmd)
 						ctrl.send(cmd, client, args)
@@ -24,7 +25,37 @@ module EventEngine
 				end
 			end
 		end
-		def self.del_controller
+		def self.del
+
+		end
+	end
+
+
+	class Event
+		attr_accessor :controllers
+		def self.add(event, klass)
+			evt = event.downcase
+
+			#Init if not already set
+			@controllers ||= {}
+			@controllers[evt] ||= []
+			@controllers[evt] << klass
+		end
+		def self.dispatch(event, args)
+			evt = event.downcase
+			return if @controllers.nil? 
+			unless @controllers[evt].nil?
+				@controllers[evt].each do |ctrl|
+					if ctrl.respond_to?(evt)
+						case ctrl.send(evt, args)
+						when EVENT_STOP
+							return
+						end 
+					end
+				end
+			end
+		end
+		def self.del
 
 		end
 	end

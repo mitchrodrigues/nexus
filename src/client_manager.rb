@@ -3,15 +3,36 @@ class ClientManager
 	attr_accessor :clients
 
 	def self.create_client(sock)
-		puts "Creating client #{sock}"
 		@clients ||= {}
-		@clients[sock.to_i] = Client.new sock
-		return
+		i = sock.to_i
+
+		@clients[i] = Client.new(sock)	
+		EventEngine::Event.dispatch("USERCON", @clients[i])
+		
+		return @clients[i]
 	end
 	
 	# Static Alias for findbyname
 	def self.find(name)
 		return find_by_name(name)
+	end
+
+	def self.client0
+		return @clients[0]
+	end
+
+	def self.clients
+		return @clients
+	end
+
+	def self.all_by_link(linkname)
+		rtn = []
+		@clients.each_value do |client|
+			if client.link.name == linkname
+				rtn << client
+			end
+		end
+		return rtn 
 	end
 
 	def self.find_by_name(name)
@@ -31,7 +52,6 @@ class ClientManager
 
 	def self.all(&block)
 		@clients.each_value do |cli| 
-			next unless cli
 			block.call cli 
 		end
 	end
