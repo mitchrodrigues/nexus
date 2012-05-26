@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+gem 'sqlite3-ruby'
+gem 'activerecord'
+gem 'activesupport'
+gem 'rake'
+gem 'json'
+gem 'libxml-ruby'
+gem 'curl-multi'
+gem 'soap4r'
+gem 'uuidtools'
