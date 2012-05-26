@@ -1,3 +1,3 @@
-class Rules << ActiveRecord::Base
+class Rule < ActiveRecord::Base
 
 end
