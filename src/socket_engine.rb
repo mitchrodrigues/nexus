@@ -61,22 +61,20 @@ class SocketEngine
       r,w,e = select(read, write, nil, 1) 
 	  unless r.nil?   
 		  r.each do |s|
-			if s.is_listener?
-				Thread.new(s.accept_nonblock) {|sock, addr| 
-					Thread.pass
+		  	next if s.nil?
+				if s.is_listener?
+					sock, addr = s.accept_nonblock 
 					sock.set_flags
 					@sockets << sock 
 					NEXUS_LOGGER.info "Accepting connection #{sock.fileno}"
-				  Nexus::ClientManager.create_client sock
-				}			
-				next
-			end
-			Thread.new(s.recv(MAX_READ)) {|inbuffer|
-				Thread.pass
-	      	  	inbuffer.split("\r\n").each do |line| 
-	      			Parser.parse_line(s, line) 
-	      		end
-	      	}
+					ClientManager.create_client sock	
+					next
+				end
+	    	inbuf = s.recv(MAX_READ)
+		    next unless inbuf
+		    inbuf.split("\r\n").each do |line| 
+		    		Parser.parse_line(s, line) 
+		    end
 		  end
 	  end
 	  unless w.nil?
@@ -91,7 +89,7 @@ class SocketEngine
   end
 
   def self.destroy(sock)
-      sock.close()
+      ClientManager.destroy_client(sock)
       @sockets.delete sock
   end
 

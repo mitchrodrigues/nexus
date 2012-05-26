@@ -72,39 +72,4 @@ module Nexus
 			end
 		end
 	end
-
-
-	class ClientManager
-		attr_accessor :clients
-
-		def self.create_client(sock)
-			puts "Creating client #{sock}"
-			@clients ||= []
-			@clients[sock.to_i] = Client.new sock
-			puts @clients.to_json
-		end
-
-		def self.find(socket)
-			return @clients[socket.to_i]
-		end
-
-		def self.all(&block)
-			@clients.each do |cli| 
-				block.call cli 
-			end
-		end
-
-		def self.destroy_client(socket)
-			sd = socket.to_i
-			@clients[sd].close
-			@clients.delete[sd] = nil
-		end
-
-		def self.raw_all(line)
-			@clients.each do |client|
-				client.send(line)
-			end
-		end
-
-	end
 end

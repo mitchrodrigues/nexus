@@ -1,11 +1,12 @@
 class Client
 
-	attr_accessor :socket, :name
+	attr_accessor :socket, :name, :host, :link
 	
 	def initialize(sock)
 		puts "Initializing client: #{sock.to_i}"
 		@socket = sock
 		@name = ""
+		return
 	end
 
 	def send(message, eol = "\r\n")
