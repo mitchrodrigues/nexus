@@ -67,7 +67,7 @@ class SocketEngine
 					sock.set_flags
 					@sockets << sock 
 					NEXUS_LOGGER.info "Accepting connection #{sock.fileno}"
-					# Nexus::ClientManager.create_client sock
+				    Nexus::ClientManager.create_client sock
 				}			
 				next
 			end
@@ -98,7 +98,7 @@ class SocketEngine
   #Open a new socket for connecting outwards
   def self.new_socket(host, port)
     s = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
-     NEXUS_LOGGER.info "Connecting to: #{host}:#{port.to_s}\n"
+    NEXUS_LOGGER.info "Connecting to: #{host}:#{port.to_s}\n"
     begin
        sockaddr_server = [
 			Socket::AF_INET, 

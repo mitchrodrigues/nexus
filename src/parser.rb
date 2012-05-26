@@ -8,17 +8,19 @@ class Parser
     end
   end
 
-  def self.tokenize(line)
-     tokens = line[0,1]!=':' ? [""] : []
-    chunk = line.split(":")
+  def self.tokenize(line_in, string_prefix = ':', token_delim = ' ')
+    tokens = line_in[0,1] != string_prefix ? [""] : []
+    chunk  = line_in.split(string_prefix)
 
     if chunk[1]
         offset = 1
     else
         offset = 0
     end
-    tokens += chunk[offset].split(" ")
+
+    tokens += chunk[offset].split(token_delim)
     tokens << chunk[2] if chunk[2]
+  
   end
 
 end

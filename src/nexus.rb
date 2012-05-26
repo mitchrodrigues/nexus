@@ -20,14 +20,13 @@ module Nexus
 			
 			@debug = false
 
-			# Parse command line arguments
+			# Parse arguments
 			args.each do |argument|
 				case argument
 				when "debug"
 					@debug = true
 				end
 			end
-
 			EventEngine::TimedEvent.add_event({
 				:class   => Nexus::Core,
 				:handler => :garbage_run 
