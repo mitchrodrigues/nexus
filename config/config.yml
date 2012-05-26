@@ -1,0 +1,15 @@
+###
+#  Runtime configuration
+##
+
+listeners:
+  primary:
+    host: localhost
+    port: 8000
+
+database:
+  adapter: sqlite3
+  database: omega_development
+  username: root
+  password: morgan
+  hostname: localhost

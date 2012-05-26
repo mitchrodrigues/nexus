@@ -48,17 +48,15 @@ module EventEngine
 					next
 				else
 					case event[:class].send(event[:handler])
-						when EVENT_STOP
-							NEXUS_LOGGER.error "TimedEvent chain has been halted by EVENT_STOP"
-							NEXUS_LOGGER.error "When handling function #{event[:class].class}.#{event[:handler]}"
-							return
-						else
-							event[:lastrun] = time
+					when EVENT_STOP
+						NEXUS_LOGGER.error "TimedEvent chain has been halted by EVENT_STOP"
+						NEXUS_LOGGER.error "When handling function #{event[:class].class}.#{event[:handler]}"
+						return
+					else
+						event[:lastrun] = time
 					end
 				end
 			end
 		end
-
 	end
-
 end

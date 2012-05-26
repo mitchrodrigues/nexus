@@ -6,18 +6,17 @@ module Nexus
 		def self.init(args)
 			@state = STATE_STARTUP
 			
-			# Open database connection using activerecord
-			ActiveRecord::Base.establish_connection(
-				YAML::load(File.open("#{CONFIG_PATH}database.yml")
-			))
 
+			# Open database connection using activerecord
+
+			@config = YAML::load(File.open("#{CONFIG_PATH}config.yml"))
+	
+			ActiveRecord::Base.establish_connection(@config["database"])
 			Signal.trap('TERM') {  @state = STATE_SHUTDOWN } 
 			Signal.trap('INT')  {  @state = STATE_SHUTDOWN } 
 			Signal.trap('QUIT') {  @state = STATE_SHUTDOWN }
 
-			#@config = YAML::load(File.open("#{CONFIG_PATH}config.yml"))
 			@time = @age = Time.now
-			
 			@debug = false
 
 			# Parse arguments
@@ -34,6 +33,10 @@ module Nexus
 
 		end
 
+		def self.config 
+			return @config
+		end
+
 		def self.garbage_run
 
 		end
@@ -48,7 +51,11 @@ module Nexus
 
 		def self.run
 			SocketEngine.init
-			SocketEngine.create_listener "0.0.0.0", "8000"
+			@config["listeners"].each_value do |listener|
+				SocketEngine.create_listener(
+						listener["host"], listener["port"]
+				)
+			end
 			@state = STATE_RUNNING
 			while @state != STATE_SHUTDOWN	
 				begin	
@@ -71,6 +78,7 @@ module Nexus
 		attr_accessor :clients
 
 		def self.create_client(sock)
+			puts "Creating client #{sock}"
 			@clients ||= []
 			@clients[sock.to_i] = Client.new sock
 			puts @clients.to_json

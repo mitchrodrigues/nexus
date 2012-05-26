@@ -1,0 +1,11 @@
+###
+# DEFAULT CONFIGURATION
+# Do not edit between these lines
+##
+
+default_listener_setup: &default_listener_setup
+  max_connetions: 1024
+  allow_fail: false
+  max_read: default
+
+#### END DEFAULT #####

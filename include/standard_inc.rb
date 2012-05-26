@@ -7,6 +7,7 @@ require 'active_record'
 require 'yaml'
 require 'logger'
 require 'socket'
+require 'ipaddr'
 
 require_relative 'constants'
 

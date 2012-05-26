@@ -1,6 +1,0 @@
-
-adapter: sqlite3
-database: omega_development
-username: root
-password: morgan
-hostname: localhost
