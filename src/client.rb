@@ -11,7 +11,6 @@ class Client
 		if sock == nil
 			@socket = rand(1024,10000)
 		end
-		puts "Initializing client: #{sock.to_i}"
 		@socket = sock
 	end
 

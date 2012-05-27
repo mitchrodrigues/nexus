@@ -23,7 +23,6 @@ class UplinkController
 	end
 
 	def self.usercon(args)
-		puts args.class.to_s
 		args.send_cmd(Nexus::Core.me, ["WELCOME", "#{VERSION_STRING}"])
 		args.send_cmd(Nexus::Core.me, 
 								 ["SERVER", Nexus::Core.me.to_s, "AUTHKEY"])

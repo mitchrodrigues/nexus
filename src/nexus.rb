@@ -7,20 +7,8 @@ module Nexus
 		def self.init(args)
 			@state = STATE_STARTUP
 			@userconfig = YAML::load(File.open("#{CONFIG_PATH}config.yml"))
-			auth = @userconfig["auth"]
-
-			puts "Retreiving configuration:"
-			puts "         URL: #{auth["url"]}"
-			puts "         Key: #{auth["key"]}"
-			json_result = JSON.parse(
-				Curl::Easy.perform("#{auth["url"]}#{auth["path"]}#{auth["key"]}").body_str
-			)
-			if json_result["status"] != 1
-				puts "This node is currently disabled"
-				exit 1
-			end
-
-		  @config = YAML::load(json_result["config"].gsub("\\r\\n", "\n"))
+		
+			get_config()
 			puts "Configuration:" 
 			puts " Server Name: #{@config["server"]["name"]}"
 			puts "       Vhost: #{@config["server"]["vhost"]}"
@@ -54,6 +42,28 @@ module Nexus
 				:class   => Nexus::Core,
 				:handler => :garbage_run 
 			})
+			EventEngine::TimedEvent.add_event({
+				:class   => Nexus::Core,
+				:handler => :get_config 
+			})
+		end
+
+		def self.get_config
+      auth = @userconfig["auth"]
+			NEXUS_LOGGER.info "Retreiving configuration values"
+			puts "Retreiving configuration:"
+			puts "         URL: #{auth["url"]}"
+			puts "         Key: #{auth["key"]}"
+		
+			json_result = JSON.parse(
+				Curl::Easy.perform("#{auth["url"]}#{auth["path"]}#{auth["key"]}").body_str
+			)
+			
+			if json_result["status"] != 1
+				puts "This node is currently disabled"
+				exit 1
+			end
+		  @config = YAML::load(json_result["config"].gsub("\\r\\n", "\n"))
 		end
 
 		def self.me

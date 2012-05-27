@@ -12,7 +12,7 @@ class ClientManager
 		return @clients[i]
 	end
 	
-	# Static Alias for findbyname
+	# Static Alias for self.find_by_name
 	def self.find(name)
 		return find_by_name(name)
 	end

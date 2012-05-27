@@ -1,5 +1,4 @@
 class Parser
-
   def self.parse_line(socket, line)
     tokens = tokenize(line)
     if tokens[0] != ""
@@ -9,12 +8,15 @@ class Parser
     unless client
       client = ClientManager.find_by_socket(socket)
     end
-    
+
     command = tokens[1]
-    puts tokens.inspect
     if client 
       NEXUS_LOGGER.info "Handling command #{command} for #{client}"
-      EventEngine::Command.dispatch(client, command, tokens[2,tokens.size])
+      EventEngine::Command.dispatch(
+        client, 
+        command, 
+        tokens[2,tokens.size-2]
+      )
     end
   end
 
