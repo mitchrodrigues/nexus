@@ -63,7 +63,11 @@ class ClientManager
 		return nil
 	end
 
-	def self.destroy_client(socket)
+	def self.destroy(client)
+		@client.close
+		@clients.delete[client.to_i] = nil
+	end
+	def self.destroy_by_socket(socket)
 		sd = socket.to_i
 		if (sd <= 0)
 			sd = index_of(socket)

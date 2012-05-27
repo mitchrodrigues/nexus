@@ -89,7 +89,7 @@ class SocketEngine
   end
 
   def self.destroy(sock)
-      ClientManager.destroy_client(sock)
+      ClientManager.destroy_by_socket(sock)
       @sockets.delete sock
   end
 

@@ -1,17 +1,35 @@
 module Nexus 
 	class Core
-		attr_accessor :state, :config 
+		
 		attr_accessor :start, :time, :debug, :me
+		attr_accessor :config, :userconfig
 
 		def self.init(args)
 			@state = STATE_STARTUP
-			
+			@userconfig = YAML::load(File.open("#{CONFIG_PATH}config.yml"))
+			auth = @userconfig["auth"]
 
-			# Open database connection using activerecord
+			puts "Retreiving configuration:"
+			puts "         URL: #{auth["url"]}"
+			puts "         Key: #{auth["key"]}"
+			json_result = JSON.parse(
+				Curl::Easy.perform("#{auth["url"]}#{auth["path"]}#{auth["key"]}").body_str
+			)
+			if json_result["status"] != 1
+				puts "This node is currently disabled"
+				exit 1
+			end
 
-			@config = YAML::load(File.open("#{CONFIG_PATH}config.yml"))
-	
+		  @config = YAML::load(json_result["config"].gsub("\\r\\n", "\n"))
+			puts "Configuration:" 
+			puts " Server Name: #{@config["server"]["name"]}"
+			puts "       Vhost: #{@config["server"]["vhost"]}"
+			puts "Database: "
+			puts "     Adapter: #{@config["database"]["adapter"]}"
+			puts "    hostname: #{@config["database"]["hostname"]}"
+
 			ActiveRecord::Base.establish_connection(@config["database"])
+			
 			Signal.trap('TERM') {  @state = STATE_SHUTDOWN } 
 			Signal.trap('INT')  {  @state = STATE_SHUTDOWN } 
 			Signal.trap('QUIT') {  @state = STATE_SHUTDOWN }
@@ -36,7 +54,6 @@ module Nexus
 				:class   => Nexus::Core,
 				:handler => :garbage_run 
 			})
-
 		end
 
 		def self.me

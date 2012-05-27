@@ -8,6 +8,7 @@ require 'yaml'
 require 'logger'
 require 'socket'
 require 'ipaddr'
+require 'curb'
 
 require_relative 'constants'
 
@@ -21,7 +22,7 @@ def require_from_dir(dir)
 			next
 		end		
 		if File.extname(item) == '.rb'
-			puts "Loading: #{item}" 			
+			#puts "Loading: #{item}" 			
 			require "#{dir}#{item}"
 		end
 	end

@@ -1,19 +1,8 @@
 ###
 #  Runtime configuration
 ##
-server:
-  name: cluster1
-  linkpass: linkP@ss
-  vhost: nexus1.omega-services.org
 
-listeners:
-  primary:
-    host: localhost
-    port: 8000
-
-database:
-  adapter: sqlite3
-  database: omega_development
-  username: root
-  password: morgan
-  hostname: localhost
+auth:
+  key: 12345679
+  url: http://localhost:3000/
+  path: n/config/?authkey=

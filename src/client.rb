@@ -8,12 +8,15 @@ class Client
 	end
 	
 	def initialize(sock)
+		if sock == nil
+			@socket = rand(1024,10000)
+		end
 		puts "Initializing client: #{sock.to_i}"
 		@socket = sock
 	end
 
 	def send(message, eol = "\r\n")
-		return if @socket == 0
+		return if @socket.kind_of?(Integer)
 		send_string = message		
 		if message.kind_of?(Array)
 			send_string = message.join(eol)
