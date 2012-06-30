@@ -24,7 +24,8 @@ class SocketEngine
   #Create a socket for listening.
   def self.create_listener(host, port) 
 	begin
-	  socket = create(host)
+	    socket = create(host)
+	    puts "Listener: #{host}:#{port}"
 		NEXUS_LOGGER.info "Opening Listener: (#{host} => #{socket.realhost}):#{port}"
 		socket.bind( Socket.sockaddr_in(port, socket.realhost.to_s))
 		socket.listen(5)
@@ -84,7 +85,7 @@ class SocketEngine
 	  end
       #Handle Errors
 	  unless e.nil?
-      	e.each { |s| destroy(s) }
+      e.each { |s| destroy(s) }
 	  end
   end
 
@@ -135,8 +136,8 @@ end
 
 
 class Socket < BasicSocket
-	attr_accessor :socket_type, :socket_state
-	attr_accessor :socket_status, :vhost, :realhost
+	attr_accessor :socket_type, :socket_state, \
+		:socket_status, :vhost, :realhost
 
 	
 	def set_flags(state = SOCKET_STATE_WRITE, 
@@ -165,7 +166,7 @@ class Socket < BasicSocket
 	end
 
 	def is_ok?
-		(@socket_status != SOCKET_DEAD)
+		(!((@socket_status == SOCKET_DEAD) || (self.closed?)))
 	end
 
 end

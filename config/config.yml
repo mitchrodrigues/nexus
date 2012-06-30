@@ -3,6 +3,6 @@
 ##
 
 auth:
-  key: 12345679
-  url: http://localhost:3000/
+  key: asd4321fg09876
+  url: http://omega-services.org/
   path: n/config/?authkey=

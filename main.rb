@@ -22,10 +22,8 @@ require_from_dir(SRC_DIR)
 # Server in 4 lines
 ##
 
-Nexus::Core.init(ARGV)
-
 NEXUS_LOGGER = Logger.new(Nexus::Core.debug ? STDOUT : LOG_PATH + "/nexus.log")
-
+Nexus::Core.init(ARGV)
 Nexus::Core.run
 Nexus::Core.shutdown
 

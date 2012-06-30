@@ -72,12 +72,13 @@ module EventEngine
 		def self.dispatch(time)
 			@events.each do |event|
 				event[:lastrun] ||= time
-				timeout = event[:timeout]? event[:timeout] : 900
+				timeout = event[:timeout] ? event[:timeout] : 900
 				if (event[:lastrun] + timeout) >= time || !event[:class]
 					next
 				elsif !event[:class].respond_to?(event[:handler])
 					next
 				else
+					NEXUS_LOGGER.info "Running timed event #{event[:class]}::#{event[:handler]}"
 					case event[:class].send(event[:handler])
 					when EVENT_STOP
 						NEXUS_LOGGER.error "TimedEvent chain has been halted by EVENT_STOP"

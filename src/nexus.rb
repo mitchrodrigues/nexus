@@ -8,13 +8,21 @@ module Nexus
 			@state = STATE_STARTUP
 			@userconfig = YAML::load(File.open("#{CONFIG_PATH}config.yml"))
 		
-			get_config()
-			puts "Configuration:" 
-			puts " Server Name: #{@config["server"]["name"]}"
-			puts "       Vhost: #{@config["server"]["vhost"]}"
-			puts "Database: "
-			puts "     Adapter: #{@config["database"]["adapter"]}"
-			puts "    hostname: #{@config["database"]["hostname"]}"
+			if !get_config
+				puts "Unable to retrieve runtime configs."
+				exit 1
+			end
+
+			# puts "Configuration:"
+			# puts " "
+			# puts " Server:" 
+			# puts "        Name: #{@config["server"]["name"]}"
+			# puts "       Vhost: #{@config["server"]["vhost"]}"
+			# puts " Database: "
+			# puts "     Adapter: #{@config["database"]["adapter"]}"
+			# puts "    hostname: #{@config["database"]["hostname"]}"
+			# puts " "
+			NEXUS_LOGGER.info "@config: #{@config.inspect}"
 
 			ActiveRecord::Base.establish_connection(@config["database"])
 			
@@ -28,8 +36,8 @@ module Nexus
 			# Parse arguments
 			args.each do |argument|
 				case argument
-				when "debug"
-					@debug = true
+					when "debug"
+						@debug = true
 				end
 			end
 
@@ -50,20 +58,27 @@ module Nexus
 
 		def self.get_config
       auth = @userconfig["auth"]
-			NEXUS_LOGGER.info "Retreiving configuration values"
-			puts "Retreiving configuration:"
-			puts "         URL: #{auth["url"]}"
-			puts "         Key: #{auth["key"]}"
-		
-			json_result = JSON.parse(
-				Curl::Easy.perform("#{auth["url"]}#{auth["path"]}#{auth["key"]}").body_str
-			)
+			NEXUS_LOGGER.info "Retrieving configuration values"
+			NEXUS_LOGGER.info "URL: #{auth['url']}#{auth['key']}"
 			
+			# puts "Retrieving configuration:"
+			# puts "         URL: #{auth["url"]}"
+			# puts "         Key: #{auth["key"]}"
+			begin 
+				json_result = JSON.parse(
+					Curl::Easy.perform("#{auth["url"]}#{auth["path"]}#{auth["key"]}").body_str
+				)
+			rescue
+				return false
+			end
+
 			if json_result["status"] != 1
 				puts "This node is currently disabled"
 				exit 1
 			end
+			
 		  @config = YAML::load(json_result["config"].gsub("\\r\\n", "\n"))
+			return true
 		end
 
 		def self.me
@@ -88,24 +103,26 @@ module Nexus
 
 		def self.run
 			SocketEngine.init
+			puts @config["listeners"].inspect
 			@config["listeners"].each_value do |listener|
+				puts listener.inspect
 				SocketEngine.create_listener(
 						listener["host"], listener["port"]
 				)
 			end
 			@state = STATE_RUNNING
-			while @state != STATE_SHUTDOWN	
-				begin	
+			begin
+				while @state != STATE_SHUTDOWN			
 					@time = Time.now # Adjust server time.
 					EventEngine::TimedEvent.dispatch(@time)
 					SocketEngine.loop_once
-				rescue => e
-					NEXUS_LOGGER.error "Shutting down on error."
-					NEXUS_LOGGER.error "Message: #{e.message}"
-					puts e.backtrace
-					shutdown	
-					break
 				end
+			rescue => e
+				NEXUS_LOGGER.error "Shutting down on error."
+				NEXUS_LOGGER.error "Message: #{e.message}"
+				NEXUS_LOGGER.error e.backtrace	
+			ensure
+				shutdown
 			end
 		end
 	end
